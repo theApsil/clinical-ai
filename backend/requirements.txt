@@ -1,0 +1,16 @@
+annotated-types==0.7.0
+certifi==2026.1.4
+cffi==2.0.0
+charset-normalizer==3.4.4
+cryptography==46.0.3
+idna==3.11
+pdfminer.six==20251230
+pdfplumber==0.11.9
+pillow==12.1.0
+pycparser==2.23
+pydantic_core==2.41.5
+pypdfium2==5.3.0
+requests==2.32.5
+typing-inspection==0.4.2
+typing_extensions==4.15.0
+urllib3==2.6.3
