@@ -1,7 +1,7 @@
 import os
 from dotenv import load_dotenv
 
-load_doten
+load_dotenv()
 
 class Settings:
     LLM_API_URL: str = os.environ["LLM_API_URL"]
