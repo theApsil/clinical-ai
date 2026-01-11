@@ -106,9 +106,20 @@ class LLMClient:
         )
 
     @staticmethod
-    def _safe_json(text: str) -> Any:
+    def _safe_json(text: str):
         import json
+        import re
+
+        if not text or not text.strip():
+            raise ValueError("LLM returned empty response")
+
+        text = text.strip()
+
+        if text.startswith("```"):
+            text = re.sub(r"^```[a-zA-Z]*\n?", "", text)
+            text = re.sub(r"\n?```$", "", text)
+
         try:
             return json.loads(text)
-        except Exception:
+        except json.JSONDecodeError:
             raise ValueError(f"LLM returned invalid JSON:\n{text}")
