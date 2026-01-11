@@ -10,7 +10,8 @@ from app.services.dialog_manager import DialogManager
 from app.api.deps import create_session
 
 router = APIRouter(prefix="/upload", tags=["upload"])
-
+BASE_DIR = Path(__file__).resolve().parents[2]
+PROMPTS_DIR = BASE_DIR / "prompts"
 
 @router.post("/")
 async def upload_guideline(file: UploadFile = File(...)):
@@ -29,9 +30,7 @@ async def upload_guideline(file: UploadFile = File(...)):
     llm = LLMClient()
     aggregator = GuidelineAggregator()
 
-    prompt = Path(
-        "app/services/prompts/extract_guideline.txt"
-    ).read_text(encoding="utf-8")
+    prompt = (PROMPTS_DIR / "extract_guideline.txt").read_text(encoding="utf-8")
 
     for chunk in chunks:
         partial = llm.extract_guideline(chunk, prompt)
@@ -40,9 +39,9 @@ async def upload_guideline(file: UploadFile = File(...)):
     guideline = aggregator.get()
 
     prompts = {
-        "extract_patient_facts": Path("app/services/prompts/extract_patient_facts.txt").read_text(encoding="utf-8"),
-        "ask_clarifying_questions": Path("app/services/prompts/ask_clarifying_questions.txt").read_text(encoding="utf-8"),
-        "final_decision": Path("app/services/prompts/final_decision.txt").read_text(encoding="utf-8"),
+        "extract_patient_facts": (PROMPTS_DIR / "extract_patient_facts.txt").read_text(encoding="utf-8"),
+        "ask_clarifying_questions": (PROMPTS_DIR / "ask_clarifying_questions.txt").read_text(encoding="utf-8"),
+        "final_decision": (PROMPTS_DIR / "final_decision.txt").read_text(encoding="utf-8"),
     }
 
     dialog_manager = DialogManager(
