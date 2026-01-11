@@ -1,10 +1,32 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
+  <meta charset="UTF-8" />
+  <title>Clinical AI Assistant</title>
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-$END$
+
+<div id="upload-screen" class="screen active">
+  <h2>Загрузка клинической рекомендации</h2>
+
+  <input type="file" id="pdf-input" accept=".pdf" />
+  <button id="upload-btn">Загрузить</button>
+
+  <p id="upload-status"></p>
+</div>
+
+<div id="chat-screen" class="screen">
+  <h2>Клинический чат</h2>
+
+  <div id="chat-window"></div>
+
+  <div class="chat-input">
+    <textarea id="chat-message" placeholder="Введите сообщение..."></textarea>
+    <button id="send-btn">Отправить</button>
+  </div>
+</div>
+
+<script src="app.js"></script>
 </body>
 </html>
