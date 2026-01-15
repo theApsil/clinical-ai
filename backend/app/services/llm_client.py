@@ -2,6 +2,8 @@ import requests
 from typing import List, Dict, Any
 from app.config import settings
 from app.logger import logger
+from app.logger import logger
+
 
 class LLMClient:
     def __init__(self):
@@ -36,6 +38,9 @@ class LLMClient:
                 "repetition_penalty": 1.0
             }
         }
+        logger.info(
+            f"LLM call started | model={model} | max_tokens={max_tokens}"
+        )
 
         response = requests.post(
             self.api_url,
@@ -44,9 +49,6 @@ class LLMClient:
         )
         response.raise_for_status()
 
-        logger.info(
-            f"LLM call started | model={model} | max_tokens={max_tokens}"
-        )
         data = response.json()
 
         return data["output"]
@@ -118,7 +120,7 @@ class LLMClient:
             raise ValueError("LLM returned empty response")
 
         text = text.strip()
-
+        logger.info(text)
         if text.startswith("```"):
             text = re.sub(r"^```[a-zA-Z]*\n?", "", text)
             text = re.sub(r"\n?```$", "", text)

@@ -52,7 +52,7 @@ function initChat(sessionId) {
         chatMessages.scrollTop = chatMessages.scrollHeight;
         
         try {
-            const response = await fetch('/chat/', {
+            const response = await fetch('/api/v1/chat/', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -62,23 +62,25 @@ function initChat(sessionId) {
                     message: text
                 })
             });
-            
+
             const data = await response.json();
-            
+
             if (!response.ok) {
                 throw new Error(data.detail || 'Ошибка отправки сообщения');
             }
-            
+
             // Удаляем индикатор загрузки
             chatMessages.removeChild(loadingDiv);
-            
+
             // Добавляем ответ бота
             // addMessage(data.response || data.message || 'Без ответа');
             let botResponseText = 'Без ответа'; // Текст по умолчанию
-    
+
             if (data.type === "questions" && Array.isArray(data.content)) {
             // Форматируем массив вопросов в читаемый текст
                 botResponseText = data.content.join('\n');
+            } else if (data.type === "final_decision"){
+                botResponseText = data.content;
             } else if (data.response) {
             // Старый формат: поле response
                 botResponseText = data.response;
