@@ -8,9 +8,3 @@ app = FastAPI(title=settings.APP_NAME)
 
 app.include_router(upload.router)
 app.include_router(chat.router)
-
-app.mount(
-    "/",
-    StaticFiles(directory="../frontend", html=True),
-    name="frontend"
-)

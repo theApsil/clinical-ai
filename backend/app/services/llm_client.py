@@ -1,7 +1,7 @@
 import requests
 from typing import List, Dict, Any
 from app.config import settings
-
+from app.logger import logger
 
 class LLMClient:
     def __init__(self):
@@ -43,6 +43,10 @@ class LLMClient:
             timeout=120
         )
         response.raise_for_status()
+
+        logger.info(
+            f"LLM call started | model={model} | max_tokens={max_tokens}"
+        )
         data = response.json()
 
         return data["output"]
