@@ -13,7 +13,7 @@ class LLMClient:
         model: str,
         system_prompt: str,
         user_content: str,
-        max_tokens: int = 2048,
+        max_tokens: int = 4096,
         temperature: float = 0.01,
     ) -> str:
         payload = {
@@ -66,7 +66,7 @@ class LLMClient:
             model="qwen_3_4b",
             system_prompt="Ты медицинский NLP-парсер.",
             user_content=prompt.replace("{{TEXT}}", text),
-            max_tokens=1000
+            max_tokens=2000
         )
         return self._safe_json(result)
 
