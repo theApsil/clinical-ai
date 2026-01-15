@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h2 class="mb-0">Загрузка медицинского документа</h2>
+            </div>
+            <div class="card-body">
+                <div class="mb-4">
+                    <p class="lead">Пожалуйста, загрузите PDF-документ с медицинскими рекомендациями для анализа.</p>
+                    <p class="text-muted">Поддерживаются только PDF файлы. Максимальный размер файла - 50MB.</p>
+                </div>
+                
+                <form id="uploadForm" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label for="fileInput" class="form-label">Выберите PDF файл</label>
+                        <input class="form-control form-control-lg" type="file" id="fileInput" name="file" accept=".pdf" required>
+                        <div class="form-text">Только PDF файлы</div>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary btn-lg" id="uploadButton">
+                            <i class="bi bi-upload me-2"></i>Загрузить документ
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.getElementById('uploadForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const fileInput = document.getElementById('fileInput');
+    const uploadButton = document.getElementById('uploadButton');
+    const file = fileInput.files[0];
+    
+    if (!file) {
+        alert('Пожалуйста, выберите файл');
+        return;
+    }
+    
+    if (file.size > 50 * 1024 * 1024) {
+        alert('Файл слишком большой. Максимальный размер - 50MB');
+        return;
+    }
+    
+    uploadButton.disabled = true;
+    uploadButton.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span>Загрузка...';
+    
+    const formData = new FormData();
+    formData.append('file', file);
+    
+    try {
+        const response = await fetch('/api/v1/upload/', {
+            method: 'POST',
+            body: formData
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+            // Перенаправляем на страницу статуса
+            window.location.href = `/status/${data.task_id}`;
+        } else {
+            throw new Error(data.detail || 'Ошибка загрузки');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert(`Ошибка загрузки: ${error.message}`);
+        uploadButton.disabled = false;
+        uploadButton.innerHTML = '<i class="bi bi-upload me-2"></i>Загрузить документ';
+    }
+});
+</script>
+{% endblock %}

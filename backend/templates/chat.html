@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        <div class="card shadow-sm">
+            <div class="card-header bg-success text-white">
+                <h2 class="mb-0">Чат с медицинским анализатором</h2>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <p class="text-muted">ID сессии: <code>{{ session_id }}</code></p>
+                </div>
+                
+                <div id="chatMessages" class="chat-container mb-4">
+                    <!-- Сообщения будут добавляться здесь -->
+                    <div class="message bot-message">
+                        <div class="message-content">
+                            <p>Здравствуйте! Я готов помочь вам с анализом медицинского документа. Чем я могу вам помочь?</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <input type="text" class="form-control" id="messageInput" placeholder="Введите ваше сообщение..." autocomplete="off">
+                    <button class="btn btn-primary" id="sendButton">
+                        <i class="bi bi-send"></i>
+                    </button>
+                </div>
+                
+                <div class="form-text mt-2">
+                    Нажмите Enter или кнопку отправки для отправки сообщения
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/chat.js"></script>
+<script>
+    // Инициализируем чат
+    initChat('{{ session_id }}');
+</script>
+{% endblock %}
