@@ -1,6 +1,6 @@
 async function checkStatus(taskId) {
     try {
-        const response = await fetch(`/upload/status/${taskId}`);
+        const response = await fetch(`/api/v1/upload/status/${taskId}`);
         const data = await response.json();
         
         if (!response.ok) {

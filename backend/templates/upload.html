@@ -58,7 +58,7 @@ document.getElementById('uploadForm').addEventListener('submit', async function(
     formData.append('file', file);
     
     try {
-        const response = await fetch('/upload/', {
+        const response = await fetch('/api/v1/upload/', {
             method: 'POST',
             body: formData
         });

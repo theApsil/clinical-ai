@@ -1,0 +1,47 @@
+version: "3.8"
+services:
+
+  backend:
+    build:
+      context: backend
+      dockerfile: Dockerfile
+    container_name: backend
+    env_file:
+      - backend/.env
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8000/healthcheck" ]
+      interval: 5s
+      timeout: 10s
+      retries: 3
+
+  frontend:
+    build:
+      context: frontend
+      dockerfile: Dockerfile
+    container_name: frontend
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:${REACT_APP_PORT:-3000}/healthcheck" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  nginx:
+    image: nginx:latest
+    container_name: nginx-for-user
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    ports:
+      - "80:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+#      frontend-module-main:
+#        condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "service", "nginx", "status" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3

@@ -1,29 +1,55 @@
-from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
-from fastapi.templating import Jinja2Templates
-from fastapi.responses import HTMLResponse
 
-from .api.routes import upload, chat
-from .config import settings, BASE_DIR
-
-
-app = FastAPI(title=settings.APP_NAME)
-
-app.mount("/static", StaticFiles(directory="static"), name="static")
-templates = Jinja2Templates(directory="templates")
-
-app.include_router(upload.router)
-app.include_router(chat.router)
+from fastapi import FastAPI
+from fastapi.openapi.docs import get_swagger_ui_html
+from fastapi.openapi.utils import get_openapi
+from fastapi.responses import JSONResponse
+from .api.routes import upload, chat, healthcheck, frontend
+from .config import settings
 
 
-@app.get("/")
-async def home(request: Request):
-    return templates.TemplateResponse("upload.html", {"request": request})
 
-@app.get("/status/{task_id}")
-async def status_page(request: Request, task_id: str):
-    return templates.TemplateResponse("status.html", {"request": request, "task_id": task_id})
 
-@app.get("/chat/{session_id}")
-async def chat_page(request: Request, session_id: str):
-    return templates.TemplateResponse("chat.html", {"request": request, "session_id": session_id})
+def create_app():
+    app = FastAPI(
+        title=settings.APP_NAME,
+        docs_url=None,
+        redoc_url=None,
+        openapi_url=None,
+    )
+
+    app.include_router(upload.router, prefix="/api/v1")
+    app.include_router(chat.router, prefix="/api/v1")
+    app.include_router(healthcheck.router)
+    app.include_router(frontend.router)
+    app.mount("/static", StaticFiles(directory="static"), name="static")
+
+    @app.get("/api/v1/openapi.json", include_in_schema=False)
+    async def custom_openapi():
+        if app.openapi_schema is None:
+            app.openapi_schema = get_openapi(
+                title=app.title,
+                version=app.version,
+                routes=app.routes,
+            )
+        return JSONResponse(app.openapi_schema)
+
+    # Эндпоинт для Swagger UI
+    @app.get("/api/v1/docs", include_in_schema=False)
+    async def custom_swagger_ui_html():
+        return get_swagger_ui_html(
+            openapi_url="/api/v1/openapi.json",
+            title=app.title + " - Swagger UI",
+            swagger_favicon_url="https://fastapi.tiangolo.com/img/favicon.png",  # опционально
+        )
+
+    # Опционально: ReDoc
+    @app.get("/api/v1/redoc", include_in_schema=False)
+    async def custom_redoc_html():
+        from fastapi.openapi.docs import get_redoc_html
+        return get_redoc_html(
+            openapi_url="/api/v1/openapi.json",
+            title=app.title + " - ReDoc",
+        )
+
+    return app
