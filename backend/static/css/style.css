@@ -94,6 +94,18 @@ body {
         height: 400px;
     }
 }
+/*окно ввода текста*/
+#messageInput {
+    height: auto;
+    min-height: 38px;
+    max-height: 200px;
+    overflow-y: hidden;
+    resize: none;
+}
+/*Перенос каждого <p>*/
+.message-content p {
+    white-space: pre-wrap;
+}
 
 /* Анимации */
 @keyframes fadeIn {

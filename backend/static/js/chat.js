@@ -2,7 +2,12 @@ function initChat(sessionId) {
     const chatMessages = document.getElementById('chatMessages');
     const messageInput = document.getElementById('messageInput');
     const sendButton = document.getElementById('sendButton');
-    
+
+    messageInput.addEventListener('input', () => {
+    messageInput.style.height = 'auto';
+    messageInput.style.height = messageInput.scrollHeight + 'px';
+});
+
     // Функция для добавления сообщения в чат
     function addMessage(text, isUser = false) {
         const messageDiv = document.createElement('div');
@@ -112,11 +117,16 @@ function initChat(sessionId) {
     // Обработчики событий
     sendButton.addEventListener('click', sendMessage);
     
-    messageInput.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
+messageInput.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') {
+        if (e.shiftKey) {
+            return;
+        } else {
+            e.preventDefault(); /
             sendMessage();
         }
-    });
-    
+    }
+});
+
     messageInput.focus();
 }
