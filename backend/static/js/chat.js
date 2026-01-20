@@ -1,12 +1,22 @@
 function initChat(sessionId) {
+    const MAX_TEXTAREA_HEIGHT = 200;
+
     const chatMessages = document.getElementById('chatMessages');
     const messageInput = document.getElementById('messageInput');
     const sendButton = document.getElementById('sendButton');
 
     messageInput.addEventListener('input', () => {
-    messageInput.style.height = 'auto';
-    messageInput.style.height = messageInput.scrollHeight + 'px';
-});
+        messageInput.style.height = 'auto';
+
+        if (messageInput.scrollHeight <= MAX_TEXTAREA_HEIGHT) {
+            messageInput.style.height = messageInput.scrollHeight + 'px';
+            messageInput.style.overflowY = 'hidden';
+        } else {
+            messageInput.style.height = MAX_TEXTAREA_HEIGHT + 'px';
+            messageInput.style.overflowY = 'auto';
+        }
+    });
+
 
     // Функция для добавления сообщения в чат
     function addMessage(text, isUser = false) {
@@ -41,6 +51,9 @@ function initChat(sessionId) {
         // Добавляем сообщение пользователя
         addMessage(text, true);
         messageInput.value = '';
+        messageInput.rows = 1;
+        messageInput.style.height = 'auto';
+        messageInput.style.overflowY = 'hidden';
         sendButton.disabled = true;
         
         // Добавляем индикатор загрузки для ответа бота
@@ -110,6 +123,9 @@ function initChat(sessionId) {
             addMessage(`❌ Ошибка: ${error.message}. Попробуйте снова.`);
         } finally {
             sendButton.disabled = false;
+            messageInput.rows = 1;
+            messageInput.style.height = 'auto';
+            messageInput.style.overflowY = 'hidden';
             messageInput.focus();
         }
     }
@@ -122,7 +138,7 @@ messageInput.addEventListener('keydown', function(e) {
         if (e.shiftKey) {
             return;
         } else {
-            e.preventDefault(); /
+            e.preventDefault();
             sendMessage();
         }
     }

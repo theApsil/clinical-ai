@@ -142,3 +142,22 @@ code {
     font-family: monospace;
     font-size: 0.9em;
 }
+
+/*кнопку отправить вниз*/
+
+.chat-input {
+  align-items: flex-end;
+}
+
+.chat-send-btn {
+  flex: 0 0 auto;
+  align-self: flex-end;
+  height: 38px;
+  min-height: 38px;
+  max-height: 38px;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
