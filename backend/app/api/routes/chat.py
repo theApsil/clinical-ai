@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
 from app.api.deps import get_session
-
+from app.logger import logger
 router = APIRouter(prefix="/chat", tags=["chat"])
 
 
