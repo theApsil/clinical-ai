@@ -89,10 +89,22 @@ body {
     .message {
         max-width: 95%;
     }
-    
+
     .chat-container {
         height: 400px;
     }
+}
+/*окно ввода текста*/
+#messageInput {
+    height: auto;
+    min-height: 38px;
+    max-height: 200px;
+    overflow-y: hidden;
+    resize: none;
+}
+/*Перенос каждого <p>*/
+.message-content p {
+    white-space: pre-wrap;
 }
 
 /* Анимации */
@@ -129,4 +141,22 @@ code {
     padding: 2px 4px;
     font-family: monospace;
     font-size: 0.9em;
+}
+
+/*кнопку отправить вниз*/
+
+.chat-input {
+  align-items: flex-end;
+}
+
+.chat-send-btn {
+  flex: 0 0 auto;
+  align-self: flex-end;
+  height: 38px;
+  min-height: 38px;
+  max-height: 38px;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
