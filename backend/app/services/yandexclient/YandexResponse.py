@@ -28,21 +28,17 @@ class YandexLlmRsDto:
     timestamp: Optional[str] = None
 
     def __post_init__(self):
-        """Автоматически устанавливаем timestamp при создании"""
         if self.timestamp is None:
             self.timestamp = datetime.now().isoformat()
 
-    @property
     def get_first_alternative(self) -> Dict[str, Any]:
         return self.alternatives[0] if self.alternatives else None
 
-    @property
     def get_first_message_text(self) -> str:
         if self.alternatives:
             return self.alternatives[0].get('output', '')
         return ''
 
-    @property
     def get_first_message_role(self) -> str:
         if self.alternatives:
             return self.alternatives[0].get('role', '')

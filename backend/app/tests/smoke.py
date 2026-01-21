@@ -5,7 +5,7 @@ from app.services.parser import PDFParser
 from app.services.chunker import TextChunker
 from app.services.guideline_aggregator import GuidelineAggregator
 from app.services.llm_client import LLMClient
-from app.services.yandexclient.YandexLlmClient import YandexLlnClient
+from app.services.yandexclient.YandexLlmClient import YandexLlmClient
 
 
 PROMPT_PATH = Path("../prompts/extract_guideline.txt")
@@ -30,7 +30,7 @@ def main(pdf_path: str):
 
     print("[3] Extracting guideline structure...")
     llm = LLMClient()
-    ya = YandexLlnClient()
+    ya = YandexLlmClient()
     aggregator = GuidelineAggregator()
     prompt_template = load_prompt()
 
