@@ -9,6 +9,7 @@ from app.services.llm_client import LLMClient
 from app.services.dialog_manager import DialogManager
 from app.api.deps import create_session
 from app.services.upload_task import create_task, update_task, get_task
+from app.services.yandexclient.YandexLlmClient import YandexLlnClient
 router = APIRouter(prefix="/upload", tags=["upload"])
 BASE_DIR = Path(__file__).resolve().parents[2]
 PROMPTS_DIR = BASE_DIR / "prompts"
@@ -48,7 +49,7 @@ def process_guideline(task_id: str, file: UploadFile):
 
         update_task(task_id, progress=40)
 
-        llm = LLMClient()
+        llm = YandexLlnClient()
         aggregator = GuidelineAggregator()
         prompt = (PROMPTS_DIR / "extract_guideline.txt").read_text("utf-8")
 
