@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-sm">
+            <div class="card-header bg-info text-white">
+                <h2 class="mb-0">Статус обработки документа</h2>
+            </div>
+            <div class="card-body">
+                <div class="mb-4">
+                    <p class="lead">Ваш документ находится в процессе обработки. Пожалуйста, подождите.</p>
+                    <p class="text-muted">ID задачи: <code>{{ task_id }}</code></p>
+                </div>
+                
+                <div class="progress mb-4">
+                    <div class="progress-bar progress-bar-striped progress-bar-animated" 
+                         role="progressbar" 
+                         id="progressBar" 
+                         style="width: 0%">
+                        <span id="progressText">0%</span>
+                    </div>
+                </div>
+                
+                <div class="alert alert-info" id="statusInfo">
+                    <i class="bi bi-info-circle me-2"></i>
+                    <span id="statusMessage">Начало обработки...</span>
+                </div>
+                
+                <div class="mt-4 text-center" id="chatButtonContainer" style="display: none;">
+                    <a href="#" id="chatButton" class="btn btn-success btn-lg">
+                        <i class="bi bi-chat-dots me-2"></i>Перейти к чату
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/status.js"></script>
+<script>
+    // Запускаем проверку статуса при загрузке страницы
+    checkStatus('{{ task_id }}');
+</script>
+{% endblock %}

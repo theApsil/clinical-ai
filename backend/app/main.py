@@ -1,9 +1,13 @@
+from fastapi.staticfiles import StaticFiles
+
 from fastapi import FastAPI
 from fastapi.openapi.docs import get_swagger_ui_html
 from fastapi.openapi.utils import get_openapi
 from fastapi.responses import JSONResponse
-from .api.routes import upload, chat, healthcheck
+from .api.routes import upload, chat, healthcheck, frontend
 from .config import settings
+
+
 
 
 def create_app():
@@ -17,8 +21,9 @@ def create_app():
     app.include_router(upload.router, prefix="/api/v1")
     app.include_router(chat.router, prefix="/api/v1")
     app.include_router(healthcheck.router)
+    app.include_router(frontend.router)
+    app.mount("/static", StaticFiles(directory="static"), name="static")
 
-    # Эндпоинт для OpenAPI JSON
     @app.get("/api/v1/openapi.json", include_in_schema=False)
     async def custom_openapi():
         if app.openapi_schema is None:
