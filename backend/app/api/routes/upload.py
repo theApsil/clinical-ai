@@ -1,14 +1,13 @@
 import uuid
 from pathlib import Path
 from fastapi import APIRouter, UploadFile, File, HTTPException, BackgroundTasks
-from app.logger import logger
 from app.services.parser import PDFParser
 from app.services.chunker import TextChunker
 from app.services.guideline_aggregator import GuidelineAggregator
-from app.services.llm_client import LLMClient
 from app.services.dialog_manager import DialogManager
 from app.api.deps import create_session
 from app.services.upload_task import create_task, update_task, get_task
+from app.services.yandexclient.YandexLlmClient import AsyncYandexLlmClient
 router = APIRouter(prefix="/upload", tags=["upload"])
 BASE_DIR = Path(__file__).resolve().parents[2]
 PROMPTS_DIR = BASE_DIR / "prompts"
@@ -29,7 +28,7 @@ async def upload_guideline(
 
     return {"task_id": task_id}
 
-def process_guideline(task_id: str, file: UploadFile):
+async def process_guideline(task_id: str, file: UploadFile):
     try:
         update_task(task_id, progress=5)
 
@@ -48,20 +47,34 @@ def process_guideline(task_id: str, file: UploadFile):
 
         update_task(task_id, progress=40)
 
-        llm = LLMClient()
+        llm = AsyncYandexLlmClient(max_concurrent_requests=10)
         aggregator = GuidelineAggregator()
         prompt = (PROMPTS_DIR / "extract_guideline.txt").read_text("utf-8")
 
-        step = 50
-        step_size = 40 / max(len(chunks), 1)
+        before_llm_progress = get_task(task_id)['progress']
+        async def update_progress_callback(task_id: str, progress_increment: float, message: str):
+            task = get_task(task_id)
+            if 'batch_progress' not in task:
+                task['batch_progress'] = 0
 
-        for chunk in chunks:
-            partial = llm.extract_guideline(chunk, prompt)
+            batch_progress = task['batch_progress'] + progress_increment
+            task['batch_progress'] = batch_progress
+
+            new_progress = min(before_llm_progress + batch_progress, 90)
+            update_task(task_id, progress=int(new_progress), message=message)
+
+        partial_results = await llm.extract_guideline_batch(
+            chunks=chunks,
+            prompt=prompt,
+            task_id=task_id,
+            update_callback=update_progress_callback
+        )
+
+        for partial in partial_results:
             aggregator.add(partial)
-            step += step_size
-            update_task(task_id, progress=int(step))
 
         guideline = aggregator.get()
+        update_task(task_id, progress=90)
 
         prompts = {
             "extract_patient_facts": (PROMPTS_DIR / "extract_patient_facts.txt").read_text("utf-8"),
