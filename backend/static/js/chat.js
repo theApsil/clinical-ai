@@ -132,7 +132,7 @@ function initChat(sessionId) {
 
     // Обработчики событий
     sendButton.addEventListener('click', sendMessage);
-
+    
 messageInput.addEventListener('keydown', function(e) {
     if (e.key === 'Enter') {
         if (e.shiftKey) {

@@ -5,6 +5,7 @@ from app.services.parser import PDFParser
 from app.services.chunker import TextChunker
 from app.services.guideline_aggregator import GuidelineAggregator
 from app.services.llm_client import LLMClient
+from app.services.yandexclient.YandexLlmClient import YandexLlmClient
 
 
 PROMPT_PATH = Path("../prompts/extract_guideline.txt")
@@ -29,13 +30,14 @@ def main(pdf_path: str):
 
     print("[3] Extracting guideline structure...")
     llm = LLMClient()
+    ya = YandexLlmClient()
     aggregator = GuidelineAggregator()
     prompt_template = load_prompt()
 
     for idx, chunk in enumerate(chunks, start=1):
         print(f"    → Processing chunk {idx}/{len(chunks)}")
         try:
-            partial = llm.extract_guideline(
+            partial = ya.extract_guideline(
                 text=chunk,
                 prompt=prompt_template
             )
