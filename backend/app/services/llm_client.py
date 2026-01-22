@@ -1,4 +1,5 @@
 import requests
+import json
 from typing import List, Dict, Any
 from app.config import settings
 from app.logger import logger
@@ -63,50 +64,64 @@ class LLMClient:
         )
         return self._safe_json(result)
 
-    def extract_patient_facts(self, text: str, prompt: str) -> Dict[str, Any]:
+    def extract_patient_facts(self, text: str, prompt: str, system_prompt: str) -> Dict[str, Any]:
         result = self._call(
             model="qwen_3_4b",
-            system_prompt="Ты медицинский NLP-парсер.",
+            system_prompt=system_prompt,
             user_content=prompt.replace("{{TEXT}}", text),
-            max_tokens=2000
+            max_tokens=1000
         )
         return self._safe_json(result)
 
     def ask_clarifying_questions(
-        self,
-        guideline_json: Dict[str, Any],
-        patient_json: Dict[str, Any],
-        prompt: str
+            self,
+            guideline_json: Dict[str, Any],
+            patient_json: Dict[str, Any],
+            prompt: str,
+            system_prompt: str,
     ) -> List[str]:
         content = (
             prompt
-            .replace("{{GUIDELINE_JSON}}", str(guideline_json))
-            .replace("{{PATIENT_JSON}}", str(patient_json))
+            .replace("{{GUIDELINE_JSON}}", json.dumps(guideline_json, ensure_ascii=False))
+            .replace("{{PATIENT_JSON}}", json.dumps(patient_json, ensure_ascii=False))
         )
 
         result = self._call(
             model="gemma_3_27b",
-            system_prompt="Ты клинический ассистент.",
+            system_prompt=system_prompt,
             user_content=content,
             max_tokens=800
         )
-        return self._safe_json(result)
+
+        questions = self._safe_json(result)
+
+        if not isinstance(questions, list):
+            raise ValueError("Clarifying questions must be JSON array")
+
+        return questions
 
     def final_decision(
-        self,
-        guideline_json: Dict[str, Any],
-        patient_json: Dict[str, Any],
-        prompt: str
+            self,
+            guideline_json: Dict[str, Any],
+            patient_json: Dict[str, Any],
+            prompt: str,
+            system_prompt: str
     ) -> str:
         content = (
             prompt
-            .replace("{{GUIDELINE_JSON}}", str(guideline_json))
-            .replace("{{PATIENT_JSON}}", str(patient_json))
+            .replace(
+                "{{GUIDELINE_JSON}}",
+                json.dumps(guideline_json, ensure_ascii=False, indent=2)
+            )
+            .replace(
+                "{{PATIENT_JSON}}",
+                json.dumps(patient_json, ensure_ascii=False, indent=2)
+            )
         )
 
         return self._call(
             model="gemma_3_27b",
-            system_prompt="Ты врач-эксперт.",
+            system_prompt=system_prompt,
             user_content=content,
             max_tokens=1200
         )
@@ -119,13 +134,6 @@ class LLMClient:
         if not text or not text.strip():
             raise ValueError("LLM returned empty response")
 
-        text = text.strip()
-        logger.info(text)
-        if text.startswith("```"):
-            text = re.sub(r"^```[a-zA-Z]*\n?", "", text)
-            text = re.sub(r"\n?```$", "", text)
+        cleaned = re.sub(r"```(?:json)?", "", text).strip("` \n")
 
-        try:
-            return json.loads(text)
-        except json.JSONDecodeError:
-            raise ValueError(f"LLM returned invalid JSON:\n{text}")
+        return json.loads(cleaned)

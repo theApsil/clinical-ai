@@ -82,7 +82,17 @@ async def process_guideline(task_id: str, file: UploadFile):
             "final_decision": (PROMPTS_DIR / "final_decision.txt").read_text("utf-8"),
         }
 
-        dialog = DialogManager(guideline, prompts)
+        system_prompts = {
+            "extract_patient_facts": "Ты медицинский NLP-парсер. Возвращай ТОЛЬКО JSON.",
+            "ask_clarifying_questions": "Ты клинический ассистент врача. Возвращай ТОЛЬКО JSON-массив строк.",
+            "final_decision": "Ты врач-эксперт. Дай клиническое решение текстом.",
+        }
+
+        dialog = DialogManager(
+            guideline=guideline,
+            prompts=prompts,
+            system_prompts=system_prompts
+        )
         session_id = create_session(dialog)
 
         update_task(
