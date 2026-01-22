@@ -32,7 +32,7 @@ async def process_guideline(task_id: str, file: UploadFile):
     try:
         update_task(task_id, progress=5)
 
-        tmp_path = Path("./tmp") / file.filename
+        tmp_path = Path("/tmp") / file.filename
         tmp_path.write_bytes(file.file.read())
 
         update_task(task_id, progress=15)
